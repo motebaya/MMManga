@@ -1,4 +1,4 @@
-from .functions import Base, datetime, re
+from .functions import Base, json
 
 class Mangadop(Base):
     
@@ -39,12 +39,12 @@ class Mangadop(Base):
             self.host + chap
         ).text
         soup = self.parse(page)
-        if (imageList := re.findall(r"(?<=<img\ssrc\=\")([^']*?)(?=\")", page)):
-             return (soup.find(class_="entry-title").text,
-              list(dict.fromkeys(
-                imageList
-             )))
+        if (data := re.search(r"(?<=ts_reader\.run\()([^']+?)(?=\);)", page)):
+            return (soup.find(class_="entry-title").text, json.loads(
+                data.group(1)
+            )["sources"][0]["images"])
         return None
+
 
 # testing
 
