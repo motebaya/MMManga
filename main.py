@@ -90,15 +90,19 @@ def _main():
 
             for index, img in enumerate(dlist, 1):
                 title, images = module.getImage(img["id"])
-                print(f"\r ~! Downloading : {index} Of {len(dlist)} chapter", end="")
-                pdf = HandlePdf()
-                pdf = pdf.adjustImage(
-                    list(pdf.getImage(images))
-                )
-                pdf[0].save("./{}/{}.pdf".format(chapter["title"], title), save_all=True, append_images=pdf[1:])
-                print(
-                    f"\n [%] Saved: {title}.pdf"
-                )
+                output = "./{}/{}.pdf".format(chapter["title"], title)
+                if not os.path.exists(output):
+                    print(f"\r ~! Downloading : {index} Of {len(dlist)} chapter", end="")
+                    pdf = HandlePdf()
+                    pdf = pdf.adjustImage(
+                        list(pdf.getImage(images))
+                    )
+                    pdf[0].save(output, save_all=True, append_images=pdf[1:])
+                    print(
+                        f"\n [%] Saved: {title}.pdf"
+                    )
+                else:
+                    continue
 
 if __name__=="__main__":
     _main()
