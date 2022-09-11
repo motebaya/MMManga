@@ -12,4 +12,4 @@ sitelist = [
 
 + but there also have some prblm, need more fast for downloading images each chapter
 <br>and i think it's still can be more **SIMPLY** bcause some file looks like same,
-<br>and yhh, i hope someone interesting to contrib to fix it :)
+<br>and yhh, i hope someone interesting to contrib for fix it :)
