@@ -110,6 +110,9 @@ class Base(AsyncClient):
 
 
 class CreatePdf(Base):
+    """
+    images dowloader with asynchronous and pdf converter
+    """
     async def req_images(self, list_url: list):
         image_data = []
         for index, value in enumerate(list_url, 1):
