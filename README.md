@@ -1,17 +1,42 @@
-+ there have 5 site.
-u can see in main file 
-```
-sitelist = [
-    "mangadop.net",
-    "sekaikomik.live",
-    "manhwaid.club",
-    "manhwadesu.me",
-    "komiklokal.me",
++ **Update**:  
+here available on **8** website, and all are is indo sub
+nothing eng sub.
+
++ **Website list:**  
+see on this line or this 
+```python
+site_list = [
+  mangadop.net,
+  manhwadesu.me,
+  sekaikomik.live,
+  komiklokal.me,
+  manhwaland.guru,
+  komik18.art,
+  komikdewasa.me,
+  manhwaid.club
 ]
 ```
 
-+ but there also have some prblm, need more fast for downloading images each chapter
-<br>and i think it's still can be more **SIMPLY** bcause some file looks like same,
-<br>and yhh, i hope someone interesting to contrib for fix it :)
++ **CLI usage**
+```
+usage: main.py [-h] [-s] [-q [...]] [-i]
 
-+ NOTE: using tmux for multiple download (may window will crash)
+	NSFW Manhwa downloader
+    Author: @github.com/motebaya
+
+options:
+  -h, --help            show this help message and exit
+  -s , --site           chose site host .eg: sekaikomik
+  -q [ ...], --query [ ...]
+                        query for search, read readme.md!
+
+additional:
+  example usage
+
+  -i, --info            info or show example
+```
+
++ Note :  
+NSFW ***18+*** warning!  
+manhwa/ manga scraping and downloader  
+credits &copy; [motebaya](https://github.com/motebaya)
