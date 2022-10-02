@@ -39,7 +39,7 @@ additional:
 + Note :  
 NSFW ***18+*** warning!  
 manhwa/ manga scraping and downloader  
-credits &copy; [motebaya](https://github.com/motebaya)
+&copy; [motebaya](https://github.com/motebaya)
 
 + Fix Error install pillow on termux:  
 [see here](https://stackoverflow.com/questions/62956054/how-to-install-pillow-on-termux)
