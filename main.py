@@ -1,108 +1,108 @@
 #!/usr/bin/python
 """
-just simpl code, use it for learn 
-i also still learn in python
-
+just for learn, so sorry if my code so bad
+created = ctime(
+    Monday Oct 3 03:32:58 2022
+)
+credits t.me/dvinchii / github.com/motebaya
 """
-from importlib import import_module
-from lib.functions import *
-from concurrent.futures import ThreadPoolExecutor
+from argparse import ArgumentParser, RawTextHelpFormatter
+from lib import (
+    CreatePdf,
+    MangaSearch,
+    Manhwaid,
+    exists
+)
+import asyncio
 
-sitelist = [
-    "mangadop.net",
-    "sekaikomik.live",
-    "manhwaid.club",
-    "manhwadesu.me",
-    "komiklokal.me",
-]
-
-def to_menu(t: list):
-    for index, value in enumerate(t, 1):
-        print(
-            f" [{index:02d}] {value.title()}"
-        )
-
-def select(min: int, max: int, q: str):
-    print()
-    while True:
-        try:
-            s = int(input(f" [#] {q.title()}: "))
-            if s in list(range(min, max + 1)):
-                return s
-            else:
-                continue
-        except ValueError:
-            continue
-
-def ask_query(s):
-    while True:
-        query = input(f" [#] {s.title()}: ")
-        if (query := query.strip()):
-            return query
-        else:
-            continue
-
-def get_range(i: str, t: list):
-    if i.lower() == "all":
-        return t[:]
-
-    if i.isdigit() and len(t) >= (int(i) - 1):
-        return t[int(i)-1]
-
-    i = list(map(int, i.split("-")))
-    i[-1] = i[-1] + 1
-    ranges = list(range(*i))
-    start, end = ranges[0] -1, ranges[-1]
-    if len(t) >= (start):
-        return t[start: end]
-
-def _main():
-    print()
-    to_menu(sitelist)
-    site = select(1, len(sitelist), "chosee")
-    filename = sitelist[site -1].split(".")[0].title()
-    Base = import_module(f"lib.{filename}")
-    module = eval(
-        "Base.{}()".format(
-            filename
-        )
-    )
-    query = ask_query("query")
-    if (result := module.search(query)):
-        result = list(result)
-        print(
-            f"\n ~! Found {len(result)} result \n"
-        )
-        to_menu(list(
-            map(lambda v: v["title"], result)
-        ))
-        chapter = select(1, len(result), "chapter")
-        chapter = result[chapter-1]
-        if (chapterlist := module.getchapter(chapter["id"])):
-
-            chapterlist = list(chapterlist)[::-1]
-            print(
-                f"\n ~! Found Total Chapter {len(chapterlist)}\n    Input Range if wanna download batch!\n    Type All if wanna download all chapter\n"
+class Main(CreatePdf):
+    """
+    main class for CLI and handle Module
+    """
+    async def _main(self, query: str, site: str):
+        site_choice = [
+            i for i in self.site_list if i.startswith(
+                site.lower()
             )
-            dlist = get_range(ask_query("Chapter (eg:1-10):"), chapterlist)
-            if not os.path.isdir(chapter["title"]):
-                os.mkdir(chapter["title"])
+        ]
+        if site_choice:
+            host = site_choice[0] if site.lower() != 'manhwaid' else 'manhwaid.club'
+            module = MangaSearch.Mangasearch() if 'manhwaid' not in host else Manhwaid.Manhwaid()
+            module.host = module.host.format(host)
+            self.debug(host)
+            if (s_result := await module.search(query)):
+                s_result = list(s_result)
+                title = list(i.get('t') for i in s_result)
+                if (chap := await self.choice(title, message=f"found ({len(s_result)}) results for query")):
+                    chap = s_result[title.index(chap)]
+                    self.check_dirs(
+                        chap.get('t')
+                    )
+                    if (chapters := await module.get_chapter(chap.get('a'))):
+                        chapters = list(chapters)[::-1]
+                        self.debug(f"found ({len(chapters)}) chapters in {chap.get('t')}")
+                        self.debug('Select chapters follow min and max range')
+                        s_chap = await self.choice(
+                            list(), 
+                            message='Input in range ({})-({})'.format(
+                                min(range(len(chapters)))+1,
+                                max(range(len(chapters)))+1
+                            )
+                        )
+                        if (c_list := self.get_range(s_chap, chapters)):
+                            for index, chaps in enumerate(c_list, 1):
+                                p_chapter = chapters.index(chaps) + 1 # chapter index position 
+                                self.debug(f"getting all images on chapter: ({p_chapter}) of ({len(c_list)})")
+                                f_output = "./{}/{}".format(chap.get('t'), f"{c_title}.pdf")
+                                if not exists(f_output): # check if chapter exist on dir or not
+                                    if (m_list := await module.get_images(chaps.get('a'))):
+                                        c_title, m_list = m_list
+                                        images_data = await self.req_images(m_list)
+                                        _pdf = await self.adjust_image(images_data)
+                                        self.debug(f"converting ({len(_pdf)}) images to pdf")
+                                        _pdf[0].save(
+                                            "./{}/{}".format(
+                                                chap.get('t'), f"{c_title}.pdf"
+                                            ), save_all=True, append_images=_pdf[1:]
+                                        )
+                                        self.debug(f"saved {c_title}.pdf")
+                                    else:
+                                        self.debug(f"skip chapters {p_chapter}", mode='red')
+                                else:
+                                    self.debug(f"skip chapters {p_chapter} alrdy downloaded", mode='yellow')
+                            self.debug(f"success downloading total {len(c_list)} chapters")
+                        return None # no need ?
+                return None
+            return None
+        return None
 
-            for index, img in enumerate(dlist, 1):
-                title, images = module.getImage(img["id"])
-                output = "./{}/{}.pdf".format(chapter["title"], title)
-                if not os.path.exists(output):
-                    print(f"\r ~! Downloading : {index} Of {len(dlist)} chapter", end="")
-                    pdf = HandlePdf()
-                    pdf = pdf.adjustImage(
-                        list(pdf.getImage(images))
-                    )
-                    pdf[0].save(output, save_all=True, append_images=pdf[1:])
-                    print(
-                        f"\n [%] Saved: {title}.pdf"
-                    )
-                else:
-                    continue
+    async def _cli(self):
+        parser = ArgumentParser(
+            description="\tNSFW Manhwa downloader\n    Author: @github.com/motebaya",
+            formatter_class=RawTextHelpFormatter
+        )
+        parser.add_argument('-s', '--site', help='chose site host .eg: sekaikomik', metavar='', type=str)
+        parser.add_argument('-q', '--query', help='query for search, read readme.md!', metavar='', type=str, nargs="*")
+        group = parser.add_argument_group('additional', description='example usage')
+        group.add_argument('-i', '--info', help='info or show example', action='store_true')
+        arg = parser.parse_args()
+        if arg.site and arg.query:
+            if any(x.startswith(arg.site) for x in self.site_list):
+                print(f"\n{parser.description}\n")
+                await self._main(
+                    '+'.join(arg.query), arg.site
+                )
+            else:
+                self.debug(f'site {arg.site} not exists in website list')
+                self.debug('usage -i for show info/example')
+                exit(1)
+        elif arg.info:
+            exit(" example usage: main.py -q doki doki -s sekaikomik")
+        else:
+            parser.print_help()
 
 if __name__=="__main__":
-    _main()
+    try:
+        asyncio.run(Main()._cli())
+    except Exception as e:
+        exit(str(e))
