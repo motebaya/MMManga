@@ -11,11 +11,11 @@ async def test_all():
     search = list(search)
     print(search)
     print()
-    chapter = await s.get_chapter(search[0]['a']) # chapter list
+    chapter = await module.get_chapter(search[0]['a']) # chapter list
     chapter = list(chapter)
     print(chapter)
     print()
-    images = await s.get_images(chapter[0]['a']) # tuple output with title & images list
+    images = await module.get_images(chapter[0]['a']) # tuple output with title & images list
     # or
     title, images_list = images # unpack tuple values
     print(images)
