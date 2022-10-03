@@ -53,10 +53,10 @@ class Main(CreatePdf):
                             for index, chaps in enumerate(c_list, 1):
                                 p_chapter = chapters.index(chaps) + 1 # chapter index position 
                                 self.debug(f"getting all images on chapter: ({p_chapter}) of ({len(c_list)})")
-                                f_output = "./{}/{}".format(chap.get('t'), f"{c_title}.pdf")
-                                if not exists(f_output): # check if chapter exist on dir or not
-                                    if (m_list := await module.get_images(chaps.get('a'))):
-                                        c_title, m_list = m_list
+                                if (m_list := await module.get_images(chaps.get('a'))):
+                                    c_title, m_list = m_list
+                                    f_output = "./{}/{}".format(chap.get('t'), f"{c_title}.pdf")
+                                    if not exists(f_output): # check if chapter exist on dir or not
                                         images_data = await self.req_images(m_list)
                                         _pdf = await self.adjust_image(images_data)
                                         self.debug(f"converting ({len(_pdf)}) images to pdf")
