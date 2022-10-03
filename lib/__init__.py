@@ -9,7 +9,7 @@ from urllib.parse import urlparse
 from httpx import AsyncClient
 from bs4 import BeautifulSoup
 from time import ctime
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 from tqdm import tqdm
 from io import BytesIO
 from questionary import select, text
@@ -110,16 +110,17 @@ class Base(AsyncClient):
 
 
 class CreatePdf(Base):
-    """
-    images dowloader with asynchronous and pdf converter
-    """
     async def req_images(self, list_url: list):
         image_data = []
         for index, value in enumerate(list_url, 1):
+            print(value)
             self.debug(f'downloading images {index} of {len(list_url)}')
-            if (content := await self.download(value)):
-                image_data.append(content)
-            else:
+            try:
+                content = await self.download(value)
+                if content:
+                    image_data.append(content)
+            except UnidentifiedImageError:
+                self.debug(f"skip {value} image corrupted!", mode='red')
                 continue
         return image_data
 
