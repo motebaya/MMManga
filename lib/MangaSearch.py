@@ -7,7 +7,7 @@ class Mangasearch(Base):
     """
     site_list = [
         mangadop.net
-        manhwadesu.me
+        manhwadesu.com
         sekaikomik.live
         komiklokal.me
         manhwaland.guru
