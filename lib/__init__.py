@@ -26,7 +26,7 @@ class Base(AsyncClient):
         self.times = lambda : ctime().split()[-2]
         self.site_list = [
             "mangadop.net",
-            "manhwadesu.me",
+            "manhwadesu.com",
             "sekaikomik.live",
             "komiklokal.me",
             "manhwaland.guru",
